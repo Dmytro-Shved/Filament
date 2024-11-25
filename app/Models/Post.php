@@ -11,11 +11,17 @@ class Post extends Model
     use HasFactory;
 
     protected $fillable = [
-      'thumbnail',
-      "title",
-      'color',
-      'slug',
-      'content',
-      'tags',
+        'title',
+        'slug',
+        'color',
+        'category_id',
+        'content',
+        'thumbnail',
+        'tags',
+        'published',
+    ];
+
+    protected $casts =[
+      'tags' => 'array',
     ];
 }
