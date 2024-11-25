@@ -6,7 +6,7 @@ use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers;
 use App\Models\Category;
 use App\Models\Post;
-use Filament\Forms;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\MarkdownEditor;
@@ -16,10 +16,11 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\CheckboxColumn;
+use Filament\Tables\Columns\ColorColumn;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Forms\Components\Checkbox;
 
 class PostResource extends Resource
 {
@@ -52,7 +53,13 @@ class PostResource extends Resource
     {
         return $table
             ->columns([
-                //
+                ImageColumn::make('thumbnail'),
+                ColorColumn::make('color'),
+                TextColumn::make('title'),
+                TextColumn::make('slug'),
+                TextColumn::make('category.name'),
+                TextColumn::make('tags'),
+                CheckboxColumn::make('published'),
             ])
             ->filters([
                 //
