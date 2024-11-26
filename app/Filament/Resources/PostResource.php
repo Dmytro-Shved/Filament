@@ -4,9 +4,11 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers;
+use App\Filament\Resources\PostResource\RelationManagers\AuthorsRelationManager;
 use App\Models\Category;
 use App\Models\Post;
 use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Group;
@@ -47,7 +49,7 @@ class PostResource extends Resource
                         ->required()
                         ->label('Category')
                         ->relationship('category', 'name')
-                            ->searchable(), // we can also add the searchable method to find all existing categories
+                            ->searchable(),
 
                     ColorPicker::make('color')->required(),
 
@@ -103,7 +105,7 @@ class PostResource extends Resource
                     ->searchable()
                     ->toggleable(),
 
-                TextColumn::make('category.name') // relationship in table of posts
+                TextColumn::make('category.name')
                     ->sortable()
                     ->searchable()
                     ->toggleable(),
@@ -134,7 +136,7 @@ class PostResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            AuthorsRelationManager::class
         ];
     }
 

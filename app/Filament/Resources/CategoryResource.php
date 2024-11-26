@@ -54,7 +54,7 @@ class CategoryResource extends Resource
             ]);
     }
 
-    public static function getRelations(): array // register the RelationManager
+    public static function getRelations(): array
     {
         return [
             PostsRelationManager::class
