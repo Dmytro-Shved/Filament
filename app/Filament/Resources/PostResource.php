@@ -10,6 +10,7 @@ use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
@@ -32,21 +33,31 @@ class PostResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('title')->required(),
-                TextInput::make('slug')->required(),
+                // Section takes the etire width
+                Section::make('Create a Post')
+                    ->description('create a new post over here')
+                    ->schema([
+                    TextInput::make('title')->required(),
+                    TextInput::make('slug')->required(),
 
-                Select::make('category_id')
-                    ->label('Category')
-                    ->options(Category::all()->pluck('name', 'id')),
+                    Select::make('category_id')
+                        ->label('Category')
+                        ->options(Category::all()->pluck('name', 'id')),
 
-                ColorPicker::make('color')->required(),
+                    ColorPicker::make('color')->required(),
 
-                MarkdownEditor::make('content')->required(),
-                // If we delete images - filament WILL NOT delete them from the disk
-                FileUpload::make('thumbnail')->disk('public')->directory('thumbnails'),
-                TagsInput::make('tags')->required(),
-                Checkbox::make('published')->required(),
-            ]);
+                    MarkdownEditor::make('content')->required()->columnSpanFull(),
+                ])->columnSpan(2)->columns(2),
+
+
+                Section::make()->schema([
+                    // If we delete images - filament WILL NOT delete them from the disk
+                    FileUpload::make('thumbnail')->disk('public')->directory('thumbnails')->columnSpanFull(),
+
+                    TagsInput::make('tags')->required(),
+                    Checkbox::make('published')->required(),
+                ])->columnSpan(1),
+            ])->columns(3);
     }
 
     public static function table(Table $table): Table
