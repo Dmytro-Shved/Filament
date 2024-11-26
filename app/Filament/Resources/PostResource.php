@@ -63,7 +63,12 @@ class PostResource extends Resource
                         Checkbox::make('published')->required(),
                     ]),
                 ]),
-            ])->columns(3);
+            ])->columns([
+                'sm' => 1,
+                'md' => 2,
+                'lg' => 3,
+                'xl' => 4,
+            ]);
     }
 
     public static function table(Table $table): Table
