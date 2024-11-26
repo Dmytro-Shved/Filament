@@ -9,6 +9,7 @@ use App\Models\Post;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Group;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -39,7 +40,6 @@ class PostResource extends Resource
                     ->schema([
                     TextInput::make('title')->required(),
                     TextInput::make('slug')->required(),
-
                     Select::make('category_id')
                         ->label('Category')
                         ->options(Category::all()->pluck('name', 'id')),
@@ -49,14 +49,20 @@ class PostResource extends Resource
                     MarkdownEditor::make('content')->required()->columnSpanFull(),
                 ])->columnSpan(2)->columns(2),
 
+                Group::make()->schema([
+                    Section::make('Image')
+                        ->collapsible()
+                        ->schema([
+                        // If we delete images - filament WILL NOT delete them from the disk
+                        FileUpload::make('thumbnail')->disk('public')->directory('thumbnails')->columnSpanFull(),
 
-                Section::make()->schema([
-                    // If we delete images - filament WILL NOT delete them from the disk
-                    FileUpload::make('thumbnail')->disk('public')->directory('thumbnails')->columnSpanFull(),
+                    ])->columnSpan(1),
 
-                    TagsInput::make('tags')->required(),
-                    Checkbox::make('published')->required(),
-                ])->columnSpan(1),
+                    Section::make('Meta')->schema([
+                        TagsInput::make('tags')->required(),
+                        Checkbox::make('published')->required(),
+                    ]),
+                ]),
             ])->columns(3);
     }
 
