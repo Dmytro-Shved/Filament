@@ -15,10 +15,13 @@ use Filament\Forms\Components\Group;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\IconPosition;
 use Filament\Tables;
 use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\ColorColumn;
@@ -36,48 +39,79 @@ class PostResource extends Resource
     {
         return $form
             ->schema([
-                Section::make('Create a Post')
-                    ->description('create a new post over here')
-                    ->schema([
-                    TextInput::make('title')
-                        ->rules(['min:2', 'max:100'])
-                        ->required(),
 
-                    TextInput::make('slug')->required()->unique(ignoreRecord: true),
-
-                    Select::make('category_id')
-                        ->required()
-                        ->label('Category')
-                        ->relationship('category', 'name')
-                            ->searchable(),
-
-                    ColorPicker::make('color')->required(),
-
-                    MarkdownEditor::make('content')->required()->columnSpanFull(),
-                ])->columnSpan(2)->columns(2),
-
-                Group::make()->schema([
-                    Section::make('Image')
-                        ->collapsible()
+                Tabs::make('Create a New Post')->tabs([
+                    // tab is identical to section
+                    Tab::make('Tab 1')
+                        ->icon('heroicon-o-inbox')->iconPosition(IconPosition::Before)->badge('Hi')
                         ->schema([
-
-                        // If we delete images - filament WILL NOT delete them from the disk
+                        TextInput::make('title')->required()->rules(['min:2', 'max:100']),
+                        TextInput::make('slug')->required()->unique(ignoreRecord: true),
+                        Select::make('category_id')
+                            ->required()
+                            ->label('Category')
+                            ->relationship('category', 'name')
+                            ->searchable(),
+                        ColorPicker::make('color')->required(),
+                    ]),
+                    Tab::make('Content')
+                        ->icon('heroicon-o-inbox-stack')
+                        ->schema([
+                        MarkdownEditor::make('content')->required()->columnSpanFull(),
+                    ]),
+                    Tab::make('Meta')
+                        ->icon('heroicon-o-photo')
+                        ->schema([
                         FileUpload::make('thumbnail')->disk('public')->directory('thumbnails')
                             ->columnSpanFull(),
-
-                    ])->columnSpan(1),
-
-                    Section::make('Meta')->schema([
                         TagsInput::make('tags')->required(),
                         Checkbox::make('published'),
                     ]),
-                ]),
-            ])->columns([
-                'sm' => 1,
-                'md' => 2,
-                'lg' => 3,
-                'xl' => 4,
-            ]);
+                ])->columnSpanFull()
+
+                    /**[->activeTab()]
+                     * makes picked tab as always opened (for example we have 3 tabs,
+                     * so we can pick one from 1,2,3,4,5)
+                     */
+                    ->activeTab(3)
+
+                    /** [->persistTabInQueryString()]
+                     * keeps the state of tabs in url
+                     * (so if you open the 2 tab and send the link to someone,
+                     * they will open page with tab you picked)
+                     */
+                    ->persistTabInQueryString(),
+
+//                Section::make('Create a Post')
+//                    ->description('create a new post over here')
+//                    ->schema([
+//                    TextInput::make('title')->required()->rules(['min:2', 'max:100']),
+//                    TextInput::make('slug')->required()->unique(ignoreRecord: true),
+//                    Select::make('category_id')
+//                        ->required()
+//                        ->label('Category')
+//                        ->relationship('category', 'name')
+//                            ->searchable(),
+//                    ColorPicker::make('color')->required(),
+//                    MarkdownEditor::make('content')->required()->columnSpanFull(),
+//                ])->columnSpan(2)->columns(2),
+//                Group::make()->schema([
+//                    Section::make('Image')
+//                        ->collapsible()
+//                        ->schema([
+//
+//                        // If we delete images - filament WILL NOT delete them from the disk
+//                        FileUpload::make('thumbnail')->disk('public')->directory('thumbnails')
+//                            ->columnSpanFull(),
+//
+//                    ])->columnSpan(1),
+//
+//                    Section::make('Meta')->schema([
+//                        TagsInput::make('tags')->required(),
+//                        Checkbox::make('published'),
+//                    ]),
+//                ]),
+            ])->columns(3);
     }
 
     public static function table(Table $table): Table
