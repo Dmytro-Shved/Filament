@@ -34,13 +34,27 @@ class PostResource extends Resource
     {
         return $form
             ->schema([
-                // Section takes the etire width
+                // Section takes the entire width
                 Section::make('Create a Post')
                     ->description('create a new post over here')
                     ->schema([
-                    TextInput::make('title')->required(),
-                    TextInput::make('slug')->required(),
+                    TextInput::make('title')
+//                        ->numeric()->minValue(2)->maxValue(15) for int
+//                        ->minLength(2) its only for TextInput
+//                        ->maxLength(10) its only for TextInput
+                        ->rules(['min:2', 'max:10'])
+                        ->in(['test', 'laravel'])
+                        ->required(),
+
+                    /**[ignoreRecord: true]
+                    * But if you edit an existing post and do not change the slug field,
+                    * then the uniqueness validation by default will assume that it is a duplicate
+                    * and throw an error
+                    */
+                    TextInput::make('slug')->required()->unique(ignoreRecord: true),
+
                     Select::make('category_id')
+                        ->required()
                         ->label('Category')
                         ->options(Category::all()->pluck('name', 'id')),
 
@@ -53,14 +67,16 @@ class PostResource extends Resource
                     Section::make('Image')
                         ->collapsible()
                         ->schema([
+
                         // If we delete images - filament WILL NOT delete them from the disk
-                        FileUpload::make('thumbnail')->disk('public')->directory('thumbnails')->columnSpanFull(),
+                        FileUpload::make('thumbnail')->disk('public')->directory('thumbnails')
+                            ->columnSpanFull(),
 
                     ])->columnSpan(1),
 
                     Section::make('Meta')->schema([
                         TagsInput::make('tags')->required(),
-                        Checkbox::make('published')->required(),
+                        Checkbox::make('published'),
                     ]),
                 ]),
             ])->columns([
