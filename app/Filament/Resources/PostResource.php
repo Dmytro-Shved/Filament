@@ -34,23 +34,13 @@ class PostResource extends Resource
     {
         return $form
             ->schema([
-                // Section takes the entire width
                 Section::make('Create a Post')
                     ->description('create a new post over here')
                     ->schema([
                     TextInput::make('title')
-//                        ->numeric()->minValue(2)->maxValue(15) for int
-//                        ->minLength(2) its only for TextInput
-//                        ->maxLength(10) its only for TextInput
-                        ->rules(['min:2', 'max:10'])
-                        ->in(['test', 'laravel'])
+                        ->rules(['min:2', 'max:100'])
                         ->required(),
 
-                    /**[ignoreRecord: true]
-                    * But if you edit an existing post and do not change the slug field,
-                    * then the uniqueness validation by default will assume that it is a duplicate
-                    * and throw an error
-                    */
                     TextInput::make('slug')->required()->unique(ignoreRecord: true),
 
                     Select::make('category_id')
@@ -91,19 +81,52 @@ class PostResource extends Resource
     {
         return $table
             ->columns([
-                ImageColumn::make('thumbnail'),
-                ColorColumn::make('color'),
-                TextColumn::make('title'),
-                TextColumn::make('slug'),
-                TextColumn::make('category.name'),
+                TextColumn::make('id')
+                    ->sortable()
+                    ->searchable()
+                    /**[ toggleable(isToggledHiddenByDefault: true) ]
+                     * by default the id field wil be hidden,
+                     * but if anyone would like to see it,
+                     * then they can just mark this in toggle bar
+                     */
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                ImageColumn::make('thumbnail')
+                    ->toggleable(), // adds the toggle bar with picked column
+
+                ColorColumn::make('color')
+                    ->toggleable(),
+
+                TextColumn::make('title')
+                ->sortable()
+                ->searchable() // adds the search bar with picked column
+                ->toggleable(),
+
+                TextColumn::make('slug')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(),
+
+                TextColumn::make('category.name')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(),
+
                 TextColumn::make('tags'),
                 CheckboxColumn::make('published'),
+                TextColumn::make('created_at')
+                    ->label('Date') // edit the basic label
+                    ->date() // convert variables in the column to a good looking date (we can give format: 'Y M D')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(), // additional button to manage our post (in this case we can delete one)
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
