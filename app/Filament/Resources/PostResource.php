@@ -46,7 +46,8 @@ class PostResource extends Resource
                     Select::make('category_id')
                         ->required()
                         ->label('Category')
-                        ->options(Category::all()->pluck('name', 'id')),
+                        ->relationship('category', 'name')
+                            ->searchable(), // we can also add the searchable method to find all existing categories
 
                     ColorPicker::make('color')->required(),
 
@@ -84,22 +85,17 @@ class PostResource extends Resource
                 TextColumn::make('id')
                     ->sortable()
                     ->searchable()
-                    /**[ toggleable(isToggledHiddenByDefault: true) ]
-                     * by default the id field wil be hidden,
-                     * but if anyone would like to see it,
-                     * then they can just mark this in toggle bar
-                     */
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 ImageColumn::make('thumbnail')
-                    ->toggleable(), // adds the toggle bar with picked column
+                    ->toggleable(),
 
                 ColorColumn::make('color')
                     ->toggleable(),
 
                 TextColumn::make('title')
                 ->sortable()
-                ->searchable() // adds the search bar with picked column
+                ->searchable()
                 ->toggleable(),
 
                 TextColumn::make('slug')
@@ -107,7 +103,7 @@ class PostResource extends Resource
                     ->searchable()
                     ->toggleable(),
 
-                TextColumn::make('category.name')
+                TextColumn::make('category.name') // relationship in table of posts
                     ->sortable()
                     ->searchable()
                     ->toggleable(),
@@ -115,8 +111,8 @@ class PostResource extends Resource
                 TextColumn::make('tags'),
                 CheckboxColumn::make('published'),
                 TextColumn::make('created_at')
-                    ->label('Date') // edit the basic label
-                    ->date() // convert variables in the column to a good looking date (we can give format: 'Y M D')
+                    ->label('Date')
+                    ->date()
                     ->sortable()
                     ->searchable()
                     ->toggleable(),
@@ -126,7 +122,7 @@ class PostResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(), // additional button to manage our post (in this case we can delete one)
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
