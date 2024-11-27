@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers;
 use App\Filament\Resources\PostResource\RelationManagers\AuthorsRelationManager;
+use App\Filament\Resources\PostResource\RelationManagers\CommentsRelationManager;
 use App\Models\Category;
 use App\Models\Post;
 use Filament\Forms\Components\Checkbox;
@@ -31,6 +32,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use League\CommonMark\Input\MarkdownInput;
 
 class PostResource extends Resource
 {
@@ -56,7 +58,6 @@ class PostResource extends Resource
                         ColorPicker::make('color')->required(),
                     ]),
 
-                    MarkdownEditor::make('content')->required()->columnSpanFull(),
 
                     Tab::make('Content')
                         ->icon('heroicon-o-inbox-stack')
@@ -145,18 +146,12 @@ class PostResource extends Resource
             ])
 
             ->filters([
-                  // Code below is identical to ternary filter
-
 //                Filter::make('Published Posts')->query(function ($query){
 //                    return $query->where('published', true);
 //                }),
 //                Filter::make('UnPublished Posts')->query(function ($query){
 //                    return $query->where('published', false);
 //                }),
-
-                /**[TernaryFilter]
-                 * creates a filter with options: (-|yes|no) so we can choose which option of published field we need
-                 */
                 TernaryFilter::make('published'),
 
                 SelectFilter::make('category_id')
@@ -164,7 +159,7 @@ class PostResource extends Resource
                     ->label('Category')
                     ->multiple()
                     ->searchable()
-                    ->preload() // so there will be some options in the filter
+                    ->preload()
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -180,7 +175,8 @@ class PostResource extends Resource
     public static function getRelations(): array
     {
         return [
-            AuthorsRelationManager::class
+            AuthorsRelationManager::class,
+            CommentsRelationManager::class
         ];
     }
 
