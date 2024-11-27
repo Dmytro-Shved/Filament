@@ -27,6 +27,9 @@ use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
 class PostResource extends Resource
@@ -39,9 +42,7 @@ class PostResource extends Resource
     {
         return $form
             ->schema([
-
                 Tabs::make('Create a New Post')->tabs([
-                    // tab is identical to section
                     Tab::make('Tab 1')
                         ->icon('heroicon-o-inbox')->iconPosition(IconPosition::Before)->badge('Hi')
                         ->schema([
@@ -54,6 +55,9 @@ class PostResource extends Resource
                             ->searchable(),
                         ColorPicker::make('color')->required(),
                     ]),
+
+                    MarkdownEditor::make('content')->required()->columnSpanFull(),
+
                     Tab::make('Content')
                         ->icon('heroicon-o-inbox-stack')
                         ->schema([
@@ -67,21 +71,7 @@ class PostResource extends Resource
                         TagsInput::make('tags')->required(),
                         Checkbox::make('published'),
                     ]),
-                ])->columnSpanFull()
-
-                    /**[->activeTab()]
-                     * makes picked tab as always opened (for example we have 3 tabs,
-                     * so we can pick one from 1,2,3,4,5)
-                     */
-                    ->activeTab(3)
-
-                    /** [->persistTabInQueryString()]
-                     * keeps the state of tabs in url
-                     * (so if you open the 2 tab and send the link to someone,
-                     * they will open page with tab you picked)
-                     */
-                    ->persistTabInQueryString(),
-
+                ])->columnSpanFull()->activeTab(3)->persistTabInQueryString(),
 //                Section::make('Create a Post')
 //                    ->description('create a new post over here')
 //                    ->schema([
@@ -153,8 +143,28 @@ class PostResource extends Resource
                     ->searchable()
                     ->toggleable(),
             ])
+
             ->filters([
-                //
+                  // Code below is identical to ternary filter
+
+//                Filter::make('Published Posts')->query(function ($query){
+//                    return $query->where('published', true);
+//                }),
+//                Filter::make('UnPublished Posts')->query(function ($query){
+//                    return $query->where('published', false);
+//                }),
+
+                /**[TernaryFilter]
+                 * creates a filter with options: (-|yes|no) so we can choose which option of published field we need
+                 */
+                TernaryFilter::make('published'),
+
+                SelectFilter::make('category_id')
+                    ->relationship('category', 'name')
+                    ->label('Category')
+                    ->multiple()
+                    ->searchable()
+                    ->preload() // so there will be some options in the filter
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
