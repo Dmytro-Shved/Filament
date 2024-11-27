@@ -131,6 +131,15 @@ class PostResource extends Resource
                     ->toggleable(),
 
                 TextColumn::make('category.name')
+                    ->badge()
+                    ->color(function (string $state) : string{
+                        return match ($state) {
+                            'PHP' => 'success', // GREEN
+                            'Filament' => 'primary', // YELLOW
+                            'Livewire' => 'info', // BLUE
+                            'Laravel' => 'danger' // RED
+                        };
+                    })
                     ->sortable()
                     ->searchable()
                     ->toggleable(),
