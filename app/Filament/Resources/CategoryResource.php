@@ -26,9 +26,9 @@ class CategoryResource extends Resource
 
     protected static ?string $modelLabel = 'Post Categories';
 
-    protected static ?string $navigationParentItem = 'Posts'; // name of a parent item (category will be a child for this resource)
+    protected static ?string $navigationParentItem = 'Posts';
 
-    protected static ?string $navigationGroup = "Blog"; // select a group
+    protected static ?string $navigationGroup = "Blog";
 
     public static function form(Form $form): Form
     {
