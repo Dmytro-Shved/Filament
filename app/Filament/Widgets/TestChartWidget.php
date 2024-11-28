@@ -5,36 +5,36 @@ namespace App\Filament\Widgets;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\User;
+use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Flowframe\Trend\Trend;
 use Flowframe\Trend\TrendValue;
 
+
 class TestChartWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Test Line Chart';
+    use InteractsWithPageFilters;
 
-//    protected static ?string $maxHeight = '300px';
+    protected static ?string $heading = 'Test Line Chart';
 
     protected function getData(): array
     {
-        /**[Trend package]
-         * Helpfull package
-         *  command: composer require flowframe/laravel-trend
-         * allows you to simply add a data to chart
-         */
-        $data = Trend::model(User::class) // model
+        $start = $this->filters['startDate'];
+        $end = $this->filters['endDate'];
+
+        $data = Trend::model(User::class)
             ->between(
-                start: now()->subMonth(6), // current date - 6 months
-                end: now() // current date
+
+            /** [$start ? Carbon::parse($start) :  now()->subMonth(6),]
+             * if start isn't a null then use carbon, but if start is null, then use default value
+             */
+                start: $start ? Carbon::parse($start) :  now()->subMonth(6),
+                end: $end ? Carbon::parse($end) :  now(),
             )
-            ->perMonth() // interval
-            ->count(); // number of users
+            ->perMonth()
+            ->count();
 
-
-        /**[line chart]
-         * line chart example below
-         * (don't forget to return type 'line' in getType() at the bottom)
-         */
         return [
             'datasets' => [
                 [
@@ -45,34 +45,10 @@ class TestChartWidget extends ChartWidget
             ],
             'labels' => $data->map(fn (TrendValue $value) => $value->date),
         ];
-
-        /**[doughnut chart]
-         * doughnut chart example below
-         * (don't forget to return type 'doughnut' in getType() at the bottom)
-         */
-//        return [
-//            'datasets' => [
-//                [
-//                    'label' => 'Posts',
-//                    'data' => [
-//                        Post::count(),
-//                        User::count(),
-//                        Category::count(),
-//                    ],
-//                    'backgroundColor' => [
-//                        'rgb(255, 99, 132)',
-//                        'rgb(54, 162, 235)',
-//                        'rgb(21, 231, 122)',
-//                    ],
-//                ],
-//            ],
-//            'labels' => ["Posts", "Users", "Categories"],
-//        ];
     }
 
     protected function getType(): string
     {
         return 'line';
-//        return 'doughnut';
     }
 }
