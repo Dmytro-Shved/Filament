@@ -20,19 +20,18 @@ class TestChartWidget extends ChartWidget
 
     protected function getData(): array
     {
-        $start = $this->filters['startDate'];
-        $end = $this->filters['endDate'];
+//        $start = $this->filters['startDate'];
+//        $end = $this->filters['endDate'];
+
+        $start = Carbon::parse('11-01-2024');
+        $end = Carbon::parse('29-11-2024');
 
         $data = Trend::model(User::class)
             ->between(
-
-            /** [$start ? Carbon::parse($start) :  now()->subMonth(6),]
-             * if start isn't a null then use carbon, but if start is null, then use default value
-             */
                 start: $start ? Carbon::parse($start) :  now()->subMonth(6),
                 end: $end ? Carbon::parse($end) :  now(),
             )
-            ->perMonth()
+            ->perWeek()
             ->count();
 
         return [
